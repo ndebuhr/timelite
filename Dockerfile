@@ -1,10 +1,16 @@
-FROM node:10
+FROM node:10 as build
 
 WORKDIR /app
 
-COPY package.json package-lock.json /app/
-RUN yarn install
-
 COPY . .
 
+RUN yarn install
 RUN yarn run prod:build
+
+FROM node:10-alpine
+
+WORKDIR /app
+
+COPY --from=build /app .
+
+CMD yarn run prod:start
